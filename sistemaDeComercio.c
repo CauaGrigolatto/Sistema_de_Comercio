@@ -19,6 +19,15 @@ typedef struct Produto {
     float preco;
 } Produto;
 
+//funções usuários
+
+void removerUsuario(Usuario usuarios[], int indice);
+Usuario copiarUsuario(Usuario usuarios[], int indice);
+Usuario criarUsuario();
+void cadastrarUsuario(Usuario usuarios[], int indice);
+void visualizarUsuarios(Usuario usuarios[], int totalUsuarios);
+
+//funções produtos
 void removerProduto(Produto produtos[], int indice);
 Produto copiarProduto(Produto produtos[], int indice);
 void visualizarProdutos(Produto produtos[], int totalProdutos);
@@ -27,27 +36,100 @@ Produto criarProduto();
 void separar();
 
 int main() {
+    Usuario usuarios[100];
+    int totalUsuarios = 0;
     
-    Produto produtos[30];
-    Produto novoProduto;
-    int totalProdutos = 0;
-
-    for (int i = 0; i < 2; i++) {
-        novoProduto = criarProduto();    
-        cadastrarProduto(produtos, i, novoProduto);
-        totalProdutos++;
-        
+    while (totalUsuarios < 2) {
+        cadastrarUsuario(usuarios, totalUsuarios);
+        totalUsuarios++;
         separar();
     }
+        
+    visualizarUsuarios(usuarios, totalUsuarios);
+    removerUsuario(usuarios, 0);
+    totalUsuarios--;
 
-    visualizarProdutos(produtos, totalProdutos);
-    
-    
-
+    printf("Usuário removido\n");
+    visualizarUsuarios(usuarios, totalUsuarios);
 
     return 0;
 }
 
+void visualizarUsuarios(Usuario usuarios[], int totalUsuarios) {
+    for (int i = 0; i < totalUsuarios; i++) {
+        printf("Adm: %d\n", usuarios[i].administrador);
+        printf("Id: %d\n", usuarios[i].id);
+        printf("Nome: %s\n", usuarios[i].nome);
+        printf("Senha: %s\n", usuarios[i].senha);
+        separar();
+    }
+    
+}
+
+void cadastrarUsuario(Usuario usuarios[], int indice) {
+    Usuario novoUsuario = criarUsuario();
+    usuarios[indice] = novoUsuario;
+}
+
+Usuario criarUsuario() {
+    Usuario novoUsuario;
+    
+    printf("Id: ");
+    scanf("%d", &novoUsuario.id);
+    getchar();
+
+    printf("Nome: ");
+    scanf("%[^\n]", novoUsuario.nome);
+    getchar();
+
+    printf("Senha: ");
+    scanf("%[^\n]", novoUsuario.senha);
+    getchar();
+
+    char isAdm;
+    printf("Cadastrar como administrador? (s/n): ");
+    scanf("%c", &isAdm);
+    getchar();
+  
+    if (isAdm == 's') {
+        novoUsuario.administrador = TRUE;
+    }
+    else {
+        novoUsuario.administrador = FALSE;
+    }
+
+    return novoUsuario;
+}
+
+void removerUsuario(Usuario usuarios[], int indice) {
+    Usuario usuarioCopia;
+    int i = indice + 1;
+
+    while (usuarios[i].nome[0] != '\0') {
+        usuarioCopia = copiarUsuario(usuarios, i);
+        usuarios[i-1] = usuarioCopia;
+        i++;
+    }
+    
+    usuarios[i].administrador = 0;
+    usuarios[i].id = 0;
+    strcpy(usuarios[i].nome, "");
+    strcpy(usuarios[i].senha, "");
+}
+
+Usuario copiarUsuario(Usuario usuarios[], int indice) {
+    Usuario usuarioCopia;
+
+    usuarioCopia.administrador = usuarios[indice].administrador;
+    usuarioCopia.id = usuarios[indice].id;
+    strcpy(usuarioCopia.nome, usuarios[indice].nome);
+    strcpy(usuarioCopia.senha, usuarios[indice].senha);
+    
+    return usuarioCopia;
+}
+
+
+//funções produtos
 void visualizarProdutos(Produto produtos[], int totalProdutos) {
     for (int i = 0; i < totalProdutos; i++) {
         printf("%d - ",i);
@@ -60,12 +142,12 @@ void visualizarProdutos(Produto produtos[], int totalProdutos) {
 }
 
 void removerProduto(Produto produtos[], int indice) {
-    Produto produtoCopia;
+    Produto copiaProduto;
     int i = indice + 1;
 
     while (produtos[i].nome[0] != '\0') {
-        produtoCopia = copiarProduto(produtos, i);
-        produtos[i-1] = produtoCopia;
+        copiaProduto = copiarProduto(produtos, i);
+        produtos[i-1] = copiaProduto;
         i++;
     }
     
