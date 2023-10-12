@@ -4,13 +4,21 @@
 #define TRUE 1
 #define FALSE 0
 
-typedef struct Usuario
-{
-    int administrador;
+typedef struct Administrador {
+    int adm;
     int id;
     char nome[30];
     char senha[30];
-} Usuario;
+} Administrador;
+
+
+typedef struct Cliente {
+    int adm;
+    int id;
+    char nome[30];
+    char senha[30];
+    Produto carrinho[100];
+} Cliente;
 
 
 typedef struct Produto {
@@ -20,12 +28,11 @@ typedef struct Produto {
 } Produto;
 
 //funções usuários
-
-void removerUsuario(Usuario usuarios[], int indice);
-Usuario copiarUsuario(Usuario usuarios[], int indice);
-Usuario criarUsuario();
-void cadastrarUsuario(Usuario usuarios[], int indice);
-void visualizarUsuarios(Usuario usuarios[], int totalUsuarios);
+void removerUsuario(Cliente usuarios[], int indice);
+Cliente copiarUsuario(Cliente usuarios[], int indice);
+Cliente criarCliente();
+void cadastrarCliente(Cliente usuarios[], int indice);
+void visualizarClientes(Cliente usuarios[], int totalUsuarios);
 
 //funções produtos
 void removerProduto(Produto produtos[], int indice);
@@ -36,96 +43,77 @@ Produto criarProduto();
 void separar();
 
 int main() {
-    Usuario usuarios[100];
-    int totalUsuarios = 0;
-    
-    while (totalUsuarios < 2) {
-        cadastrarUsuario(usuarios, totalUsuarios);
-        totalUsuarios++;
-        separar();
-    }
-        
-    visualizarUsuarios(usuarios, totalUsuarios);
-    removerUsuario(usuarios, 0);
-    totalUsuarios--;
+    int idAdministradores[100];
+    int idClientes[100];
+    int codigosProdutos[100];
 
-    printf("Usuário removido\n");
-    visualizarUsuarios(usuarios, totalUsuarios);
+    
+
 
     return 0;
 }
 
-void visualizarUsuarios(Usuario usuarios[], int totalUsuarios) {
-    for (int i = 0; i < totalUsuarios; i++) {
-        printf("Adm: %d\n", usuarios[i].administrador);
-        printf("Id: %d\n", usuarios[i].id);
-        printf("Nome: %s\n", usuarios[i].nome);
-        printf("Senha: %s\n", usuarios[i].senha);
+void visualizarClientes(Cliente clientes[], int totalClientes) {
+    for (int i = 0; i < totalClientes; i++) {
+        printf("Adm: %d\n", clientes[i].adm);
+        printf("Id: %d\n", clientes[i].id);
+        printf("Nome: %s\n", clientes[i].nome);
+        printf("Senha: %s\n", clientes[i].senha);
         separar();
     }
     
 }
 
-void cadastrarUsuario(Usuario usuarios[], int indice) {
-    Usuario novoUsuario = criarUsuario();
-    usuarios[indice] = novoUsuario;
+void cadastrarCliente(Cliente clientes[], int indice) {
+    Cliente novoCliente = criarCliente();
+    clientes[indice] = novoCliente;
 }
 
-Usuario criarUsuario() {
-    Usuario novoUsuario;
+Cliente criarCliente() {
+    Cliente novoCliente;
     
     printf("Id: ");
-    scanf("%d", &novoUsuario.id);
+    scanf("%d", &novoCliente.id);
     getchar();
 
     printf("Nome: ");
-    scanf("%[^\n]", novoUsuario.nome);
+    scanf("%[^\n]", novoCliente.nome);
     getchar();
 
     printf("Senha: ");
-    scanf("%[^\n]", novoUsuario.senha);
-    getchar();
-
-    char isAdm;
-    printf("Cadastrar como administrador? (s/n): ");
-    scanf("%c", &isAdm);
+    scanf("%[^\n]", novoCliente.senha);
     getchar();
   
-    if (isAdm == 's') {
-        novoUsuario.administrador = TRUE;
-    }
-    else {
-        novoUsuario.administrador = FALSE;
-    }
+    novoCliente.adm = FALSE;
 
-    return novoUsuario;
+    return novoCliente;
 }
 
-void removerUsuario(Usuario usuarios[], int indice) {
-    Usuario usuarioCopia;
+void removerCliente(Cliente clientes[], int indice) {
+    Cliente clienteCopia;
     int i = indice + 1;
 
-    while (usuarios[i].nome[0] != '\0') {
-        usuarioCopia = copiarUsuario(usuarios, i);
-        usuarios[i-1] = usuarioCopia;
+    while (clientes[i].nome[0] != '\0') {
+        clienteCopia = copiarUsuario(clientes, i);
+        clientes[i-1] = clienteCopia;
         i++;
     }
     
-    usuarios[i].administrador = 0;
-    usuarios[i].id = 0;
-    strcpy(usuarios[i].nome, "");
-    strcpy(usuarios[i].senha, "");
+    clientes[i].adm = 0;
+    clientes[i].id = 0;
+    strcpy(clientes[i].nome, "");
+    strcpy(clientes[i].senha, "");
 }
 
-Usuario copiarUsuario(Usuario usuarios[], int indice) {
-    Usuario usuarioCopia;
+Cliente copiarCliente(Cliente clientes[], int indice) {
+    Cliente clienteCopia;
 
-    usuarioCopia.administrador = usuarios[indice].administrador;
-    usuarioCopia.id = usuarios[indice].id;
-    strcpy(usuarioCopia.nome, usuarios[indice].nome);
-    strcpy(usuarioCopia.senha, usuarios[indice].senha);
+    clienteCopia.adm = clientes[indice].adm;
+    clienteCopia.id = clientes[indice].id;
+    strcpy(clienteCopia.nome, clientes[indice].nome);
+    strcpy(clienteCopia.senha, clientes[indice].senha);
     
-    return usuarioCopia;
+    return clienteCopia;
 }
 
 
