@@ -37,11 +37,11 @@ typedef struct Cliente {
 } Cliente;
 
 //validações
-int validarSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
-int validarIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
+int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
+int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
 
-int validarSenhaAdministrador(char senhaEntrada[30], Administrador adms[], int totalAdms);
-int validarIdAdministrador(int idEntrada, Administrador adms[], int totalAdms);
+int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms);
+int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms);
 
 //funções extras
 void redMessage(char message[]);
@@ -120,24 +120,38 @@ int main() {
             if (decisao == 1) {
 
                 novoAdm = criarAdministrador();
-                administradores[totalAdms] = novoAdm;
-                totalAdms++;
+                existeAdm = verificacaoIdAdm(novoAdm.id, administradores, totalAdms);
 
-                system(CLEAR_SCREEN);
-                greenMessage("Administrador cadastrado com sucesso!\n");
+                if (existeAdm == FALSE) {
+                    administradores[totalAdms] = novoAdm;
+                    totalAdms++;
+
+                    system(CLEAR_SCREEN);
+                    greenMessage("Administrador cadastrado com sucesso!\n"); 
+                }
+                else {
+                    redMessage("ID já cadastrado\n");
+                }
             
             }
             else if (decisao == 2) {
 
                 novoCliente = criarCliente();
-                clientes[totalClientes] = novoCliente;
-                totalClientes++;
+                existeCliente = verificacaoIdCliente(novoCliente.id, clientes, totalAdms);
 
-                system(CLEAR_SCREEN);
-                greenMessage("Cliente cadastrado com sucesso!\n");
+                if (existeCliente == FALSE) {
 
+                    clientes[totalClientes] = novoCliente;
+                    totalClientes++;
+
+                    system(CLEAR_SCREEN);
+                    greenMessage("Cliente cadastrado com sucesso!\n");
+                }
+                else {
+                    redMessage("ID já cadastrado\n");
+                }
+                
             }
-
         }
         else if (decisao == 2) {
             existeAdm = totalAdms != 0; 
@@ -158,8 +172,8 @@ int main() {
                     scanf("%[^\n]", senhaLogin);
                     getchar();
 
-                    idValido = validarIdAdministrador(idLogin, administradores, totalAdms);
-                    senhaValida = validarSenhaAdministrador(senhaLogin, administradores, totalAdms);
+                    idValido = verificacaoIdAdm(idLogin, administradores, totalAdms);
+                    senhaValida = verificacaoSenhaAdm(senhaLogin, administradores, totalAdms);
                     permitirAcessoAdm = idValido && senhaValida;
                     system(CLEAR_SCREEN);
 
@@ -182,8 +196,8 @@ int main() {
                     scanf("%[^\n]", senhaLogin);
                     getchar();
 
-                    idValido = validarIdCliente(idLogin, clientes, totalClientes);
-                    senhaValida = validarSenhaCliente(senhaLogin, clientes, totalClientes);
+                    idValido = verificacaoIdCliente(idLogin, clientes, totalClientes);
+                    senhaValida = verificacaoSenhaCliente(senhaLogin, clientes, totalClientes);
                     permitirAcessoCliente = idValido && senhaValida;
                     system(CLEAR_SCREEN);
 
@@ -283,64 +297,6 @@ int main() {
     return 0;
 }
 
-//validações
-
-int validarSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalClientes) && (validacao == FALSE)) {
-        if (strcmp(senhaEntrada, clientes[i].senha) == 0) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
-int validarIdCliente(int idEntrada, Cliente clientes[], int totalClientes) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalClientes) && (validacao == FALSE)) {
-        if (clientes[i].id == idEntrada) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
-int validarSenhaAdministrador(char senhaEntrada[30], Administrador adms[], int totalAdms) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalAdms) && (validacao == FALSE)) {
-        if (strcmp(senhaEntrada, adms[i].senha) == 0) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
-int validarIdAdministrador(int idEntrada, Administrador adms[], int totalAdms) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalAdms) && (validacao == FALSE)) {
-        if (adms[i].id == idEntrada) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
 //funções extras
 void redMessage(char message[]) {
     printf("\033[1;31m%s\033[1;31m", message);
@@ -357,6 +313,34 @@ void blueMessage(char message[]) {
 }
 
 //funções de adm
+int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalAdms) && (validacao == FALSE)) {
+        if (adms[i].id == idEntrada) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
+}
+
+int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalAdms) && (validacao == FALSE)) {
+        if (strcmp(senhaEntrada, adms[i].senha) == 0) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
+}
+
 Administrador criarAdministrador() {
     Administrador novoAdm;
     
@@ -378,6 +362,34 @@ Administrador criarAdministrador() {
 }
 
 //funções de clientes
+int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalClientes) && (validacao == FALSE)) {
+        if (strcmp(senhaEntrada, clientes[i].senha) == 0) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
+}
+
+int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalClientes) && (validacao == FALSE)) {
+        if (clientes[i].id == idEntrada) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
+}
+
 void visualizarClientes(Cliente clientes[], int totalClientes) {
     for (int i = 0; i < totalClientes; i++) {
         printf("Adm: %d\n", clientes[i].adm);
