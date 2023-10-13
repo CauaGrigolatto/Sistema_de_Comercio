@@ -36,13 +36,6 @@ typedef struct Cliente {
     Produto carrinho[100];
 } Cliente;
 
-//validações
-int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
-int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
-
-int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms);
-int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms);
-
 //funções extras
 void redMessage(char message[]);
 void greenMessage(char message[]);
@@ -50,12 +43,19 @@ void blueMessage(char message[]);
 
 //funções de adm
 Administrador criarAdministrador();
+int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms);
+int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms);
+Administrador copiarAdm(Administrador adms[], int indice);
+int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms);
 
-//funções usuários
+//funções clientes
 void removerCliente(Cliente usuarios[], int indice);
 Cliente copiarCliente(Cliente usuarios[], int indice);
 Cliente criarCliente();
 void visualizarClientes(Cliente usuarios[], int totalUsuarios);
+int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes);
+int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
+int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
 
 //funções produtos
 void removerProduto(Produto produtos[], int indice);
@@ -70,28 +70,35 @@ int main() {
     Cliente clientes[100];
     Produto produtos[100];
 
-    int idAdministradores[100];
-    int idClientes[100];
-    int codigosProdutos[100];
+    Cliente novoCliente;
+    Administrador novoAdm;
+    Produto novoProduto;
+
+    Cliente clienteLogado;
+    Administrador admLogado;
 
     int totalAdms = 0;
     int totalClientes = 0;
     int totalProdutos = 0;
 
-    Cliente novoCliente;
-    Administrador novoAdm;
-    Produto novoProduto;
+    int idAdministradores[100];
+    int idClientes[100];
+    int codigosProdutos[100];
 
+
+    int decisao;
     int idLogin;
     char senhaLogin[30];
 
-    int decisao;
+    int indiceAdm;
+    int indiceCliente;
 
+    //Flags
     int existeAdm; 
     int existeCliente;
 
-    int idValido = FALSE;
-    int senhaValida = FALSE; 
+    int idValido;
+    int senhaValida; 
 
     int permitirAcessoAdm;
     int permitirAcessoCliente;
@@ -150,7 +157,7 @@ int main() {
                 else {
                     redMessage("ID já cadastrado\n");
                 }
-                
+
             }
         }
         else if (decisao == 2) {
@@ -172,12 +179,17 @@ int main() {
                     scanf("%[^\n]", senhaLogin);
                     getchar();
 
-                    idValido = verificacaoIdAdm(idLogin, administradores, totalAdms);
-                    senhaValida = verificacaoSenhaAdm(senhaLogin, administradores, totalAdms);
-                    permitirAcessoAdm = idValido && senhaValida;
                     system(CLEAR_SCREEN);
 
-                    if (permitirAcessoAdm) {    
+                    idValido = verificacaoIdAdm(idLogin, administradores, totalAdms);
+                    senhaValida = verificacaoSenhaAdm(senhaLogin, administradores, totalAdms);
+
+                    permitirAcessoAdm = idValido && senhaValida;
+                    
+                    if (permitirAcessoAdm) { 
+                        indiceAdm = encontrarIndiceAdm(idLogin, administradores, totalAdms);
+                        admLogado = copiarAdm(administradores, indiceAdm);
+
                         greenMessage("Você entrou como administrador\n");
                     }
                     else {
@@ -223,6 +235,7 @@ int main() {
         }
 
         if (permitirAcessoAdm) {
+            printf("Bem-vindo(a), %s\n", admLogado.nome);
 
             while (decisao != 6) {
                 blueMessage("1- Cadastrar produto\n");
@@ -361,6 +374,31 @@ Administrador criarAdministrador() {
     return novoAdm;
 }
 
+Administrador copiarAdm(Administrador adms[], int indice) {
+    Administrador admCopia;
+
+    admCopia.adm = adms[indice].adm;
+    admCopia.id = adms[indice].id;
+    strcpy(admCopia.nome, adms[indice].nome);
+    strcpy(admCopia.senha, adms[indice].senha);
+    
+    return admCopia;
+}
+
+int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms) {
+    int indice = -1;
+    int i = 0;
+
+    while ((i < totalAdms) && (indice == -1)) {
+        if (adms[i].id == idEntrada) {
+            indice = i;
+        }
+        i++;
+    }
+    
+    return indice;
+}
+
 //funções de clientes
 int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes) {
     int validacao = FALSE;
@@ -456,6 +494,19 @@ Cliente copiarCliente(Cliente clientes[], int indice) {
     return clienteCopia;
 }
 
+int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes) {
+    int indice = -1;
+    int i = 0;
+
+    while ((i < totalClientes) && (indice != -1)) {
+        if (clientes[i].id == idEntrada) {
+            indice = i;
+        }
+        i++;
+    }
+    
+    return indice;
+}
 
 //funções produtos
 void visualizarProdutos(Produto produtos[], int totalProdutos) {
