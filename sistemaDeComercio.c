@@ -1,8 +1,24 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TRUE 1
 #define FALSE 0
+
+#ifdef _WIN32
+#include <conio.h>
+#include <windows.h>
+#define CLEAR_SCREEN "cls"
+#else
+#include <unistd.h>
+#define CLEAR_SCREEN "clear"
+#endif
+
+typedef struct Produto {
+    char codigo[10];
+    char nome[30];
+    float preco;
+} Produto;
 
 typedef struct Administrador {
     int adm;
@@ -20,18 +36,17 @@ typedef struct Cliente {
     Produto carrinho[100];
 } Cliente;
 
+//funções extras
+void errorMessage(char message[20]);
+void successMessage(char message[20]);
 
-typedef struct Produto {
-    char codigo[10];
-    char nome[30];
-    float preco;
-} Produto;
+//funções de adm
+Administrador criarAdministrador();
 
 //funções usuários
-void removerUsuario(Cliente usuarios[], int indice);
-Cliente copiarUsuario(Cliente usuarios[], int indice);
+void removerCliente(Cliente usuarios[], int indice);
+Cliente copiarCliente(Cliente usuarios[], int indice);
 Cliente criarCliente();
-void cadastrarCliente(Cliente usuarios[], int indice);
 void visualizarClientes(Cliente usuarios[], int totalUsuarios);
 
 //funções produtos
@@ -43,16 +58,106 @@ Produto criarProduto();
 void separar();
 
 int main() {
+    Administrador administradores[100];
+    Cliente clientes[100];
+    Produto produtos[100];
+
     int idAdministradores[100];
     int idClientes[100];
     int codigosProdutos[100];
 
+    int totalAdms = 0;
+    int totalClientes = 0;
+    int totalProdutos = 0;
+
+    Cliente novoCliente;
+    Administrador novoAdm;
+    Produto novoProduto;
+
+
+    int decisao;
+
+    printf("1- Cadastrar\n");
+    printf("2- Entrar\n");
+    printf("4- Sair\n");
+    scanf("%d", &decisao);
+    
+    system(CLEAR_SCREEN);
     
 
+    if (decisao == 1) {
+        printf("1- Cadastrar cliente\n");
+        printf("2- Cadastrar administrador\n");
+        scanf("%d", &decisao);
 
+        if (decisao == 1) {
+
+            novoCliente = criarCliente();
+            clientes[totalClientes] = novoCliente;
+            totalClientes++;
+            successMessage("Cliente cadastrado com sucesso!\n");
+        
+        }
+        else if (decisao == 2) {
+
+            novoAdm = criarAdministrador();
+            administradores[totalAdms] = novoAdm;
+            totalAdms++;
+            successMessage("Administrador cadastrado com sucesso!\n");
+
+        }
+
+    }
+    else if (decisao == 2) {
+        int existeAdm = totalAdms != 0; 
+        int existeCliente = totalClientes != 0;
+        
+        if (existeAdm || existeCliente) {
+        
+        }
+        else {
+            errorMessage("Ops, parece que não há cadastros!\n");
+        }
+    }
+    else if (decisao == 3) {
+
+    }
+
+    
     return 0;
 }
 
+//funções extras
+void errorMessage(char message[20]) {
+    printf("\033[1;31m%s\033[1;31m", message);
+}
+
+void successMessage(char message[20]) {
+    printf("\033[1;32m%s\033[1;32m", message);
+}
+
+//funções de adm
+Administrador criarAdministrador() {
+    Administrador novoAdm;
+    
+    printf("Id: ");
+    scanf("%d", &novoAdm.id);
+    getchar();
+
+    printf("Nome: ");
+    scanf("%[^\n]", novoAdm.nome);
+    getchar();
+
+    printf("Senha: ");
+    scanf("%[^\n]", novoAdm.senha);
+    getchar();
+  
+    novoAdm.adm = TRUE;
+
+    return novoAdm;
+}
+
+//funções de clientes
 void visualizarClientes(Cliente clientes[], int totalClientes) {
     for (int i = 0; i < totalClientes; i++) {
         printf("Adm: %d\n", clientes[i].adm);
@@ -62,11 +167,6 @@ void visualizarClientes(Cliente clientes[], int totalClientes) {
         separar();
     }
     
-}
-
-void cadastrarCliente(Cliente clientes[], int indice) {
-    Cliente novoCliente = criarCliente();
-    clientes[indice] = novoCliente;
 }
 
 Cliente criarCliente() {
@@ -94,7 +194,7 @@ void removerCliente(Cliente clientes[], int indice) {
     int i = indice + 1;
 
     while (clientes[i].nome[0] != '\0') {
-        clienteCopia = copiarUsuario(clientes, i);
+        clienteCopia = copiarCliente(clientes, i);
         clientes[i-1] = clienteCopia;
         i++;
     }
