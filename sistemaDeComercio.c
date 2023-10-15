@@ -131,6 +131,8 @@ int main() {
             blueMessage("2- Cadastrar cliente\n");
             scanf("%d", &decisao);
 
+            system(CLEAR_SCREEN);
+
             if (decisao == 1) {
 
                 novoAdm = criarAdministrador();
@@ -164,7 +166,10 @@ int main() {
                 else {
                     redMessage("ID já cadastrado\n");
                 }
-
+            }
+            else {
+                redMessage("Opção inválida\n");
+                decisao = 0;
             }
         }
         else if (decisao == 2) {
@@ -175,6 +180,8 @@ int main() {
                 blueMessage("1- Entrar como administrador\n");
                 blueMessage("2- Entrar como cliente\n");
                 scanf("%d", &decisao);
+
+                system(CLEAR_SCREEN);
 
                 if ((decisao == 1) && existeAdm) {
 
@@ -202,8 +209,6 @@ int main() {
                     else {
                         redMessage("ID ou senha incorretos\n");
                     }
-                
-                
                 }
                 else if ((decisao == 2) && existeCliente) {
 
@@ -215,11 +220,12 @@ int main() {
                     scanf("%[^\n]", senhaLogin);
                     getchar();
 
+                    system(CLEAR_SCREEN);
+
                     idValido = verificacaoIdCliente(idLogin, clientes, totalClientes);
                     senhaValida = verificacaoSenhaCliente(senhaLogin, clientes, totalClientes);
                     permitirAcessoCliente = idValido && senhaValida;
-                    system(CLEAR_SCREEN);
-
+                    
                     if (permitirAcessoCliente) {    
                         indiceCliente = encontrarIndiceCliente(idLogin, clientes, totalClientes);
                         clienteLogado = &clientes[indiceCliente];
@@ -232,7 +238,8 @@ int main() {
 
                 }
                 else {
-                    redMessage("Ops, parece que não há cadastros!\n");    
+                    redMessage("Opção inválida\n");    
+                    decisao = 0;
                 }
             }
             else {
@@ -242,6 +249,9 @@ int main() {
         else if (decisao == 3) {
             system(CLEAR_SCREEN);
             blueMessage("Bye\n");
+        }
+        else {
+            redMessage("Opção inválida\n");
         }
 
         if (permitirAcessoAdm) {
@@ -334,10 +344,15 @@ int main() {
                         blueMessage("Cód. produto (-1 para sair): \n");
                         scanf("%d", &decisao);
 
+                        system(CLEAR_SCREEN);
+
                         if (decisao != -1) {
                             indiceProduto = encontrarIndiceProduto(decisao, produtos, totalProdutos);
                             novoProduto = copiarProduto(produtos, indiceProduto);
                             comprarProduto(novoProduto, clienteLogado->produtosComprados);
+
+                            system(CLEAR_SCREEN);
+                            greenMessage("Produto adquirido\n");
                         }
                         else if (decisao == -1) {
                             redMessage("Compra cancelada\n");
@@ -350,8 +365,6 @@ int main() {
                 } else if (decisao == 2) {
                     totalComprados = contarProdutosComprados(clienteLogado->produtosComprados);
                     
-                    printf("Você comprou %d produtos\n", totalComprados);
-                    
                     if (totalComprados > 0) {
                         visualizarProdutos(clienteLogado->produtosComprados, totalComprados);
                     }
@@ -362,11 +375,12 @@ int main() {
                 else if (decisao == 3) {
                     redMessage("Saiu da conta\n");
                 }
+
+                decisao = 0;
+            
             }
                         
-            decisao = 0;
-        }
-        
+        }    
     }
     
     return 0;
