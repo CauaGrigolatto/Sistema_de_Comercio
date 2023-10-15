@@ -40,6 +40,7 @@ int confirmarComCredenciais(int idEntrada, char senhaEntrada[]);
 void redMessage(char message[]);
 void greenMessage(char message[]);
 void blueMessage(char message[]);
+void yellowMessage(char message[]);
 
 //funções de adm
 Administrador criarAdministrador();
@@ -54,6 +55,7 @@ void removerCliente(Cliente usuarios[], int indice);
 Cliente copiarCliente(Cliente usuarios[], int indice);
 Cliente criarCliente();
 void visualizarClientes(Cliente usuarios[], int totalUsuarios);
+void visualizarDetalhesCliente(Cliente cliente);
 int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes);
 int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
 int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
@@ -65,6 +67,7 @@ int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos
 void removerProduto(Produto produtos[], int indice);
 Produto copiarProduto(Produto produtos[], int indice);
 void visualizarProdutos(Produto produtos[], int totalProdutos);
+int verificacaoCodigoProduto(int codEntrada, Produto produtos[], int totalProdutos);
 void cadastrarProduto(Produto produtos[], int indice, Produto produto);
 Produto criarProduto();
 
@@ -89,16 +92,12 @@ int main() {
     int totalProdutos = 0;
     int totalComprados = 0;
 
-    int idAdministradores[100];
-    int idClientes[100];
-    int codigosProdutos[100];
-
     int decisao;
 
     int idLogin;
     char senhaLogin[30];
 
-    int idRemocao;
+    int idEntrada;
 
     int indiceAdm;
     int indiceCliente;
@@ -278,12 +277,19 @@ int main() {
 
                 if (decisao == 1) {
                     novoProduto = criarProduto();
-                    cadastrarProduto(produtos, totalProdutos, novoProduto);
-                    totalProdutos++;
+                    existeProduto = verificacaoCodigoProduto(novoProduto.codigo, produtos, totalProdutos);
 
                     system(CLEAR_SCREEN);
 
-                    greenMessage("Novo produto cadastrado!\n");
+                    if (existeProduto == FALSE) {
+                        cadastrarProduto(produtos, totalProdutos, novoProduto);
+                        totalProdutos++;
+                        greenMessage("Novo produto cadastrado!\n");
+                    }
+                    else {
+                        redMessage("Código já cadastrado\n");
+                    }
+
                 }
                 else if (decisao == 2) {
                     if (totalProdutos > 0) {
@@ -299,15 +305,15 @@ int main() {
                         redMessage("Excluir produto:\n");
                         visualizarProdutos(produtos, totalProdutos);
                         blueMessage("Cód. produto: ");
-                        scanf("%d", &idRemocao);
+                        scanf("%d", &idEntrada);
                         getchar();
 
-                        separar();
-                        
+                        system(CLEAR_SCREEN);
+
                         permitirAcessoAdm = confirmarComCredenciais(admLogado->id, admLogado->senha);
 
                         if (permitirAcessoAdm) {
-                            indiceProduto = encontrarIndiceProduto(idRemocao, produtos, totalProdutos);
+                            indiceProduto = encontrarIndiceProduto(idEntrada, produtos, totalProdutos);
                             removerProduto(produtos, indiceProduto);
                             totalProdutos--;    
                             greenMessage("Produto removido\n");
@@ -325,6 +331,40 @@ int main() {
                 else if (decisao == 4) {
                     if (totalClientes > 0){
                         visualizarClientes(clientes, totalClientes);
+
+                        blueMessage("1- Visualizar cliente com detalhes\n");
+                        blueMessage("2- Voltar\n");
+                        scanf("%d", &decisao);
+
+                        system(CLEAR_SCREEN);
+
+                        if (decisao == 1) {
+                            visualizarClientes(clientes, totalClientes);
+                            blueMessage("ID Cliente: ");
+                            scanf("%d", &idEntrada);
+                            getchar();
+
+                            system(CLEAR_SCREEN);
+
+                            indiceCliente = encontrarIndiceCliente(idEntrada, clientes, totalClientes);
+                            existeCliente = indiceCliente != -1;
+
+                            if (existeCliente) {
+                                novoCliente = clientes[indiceCliente];
+                                visualizarDetalhesCliente(novoCliente);
+
+                                yellowMessage("Pressione ENTER para voltar\n");
+                                getchar();
+                                system(CLEAR_SCREEN);
+                            }
+                            else {
+                                redMessage("ID inválido\n");
+                            }
+                        }
+                        else {
+                            redMessage("Opção inválida\n");
+                        }
+                    
                     }
                     else {
                         redMessage("Não há clientes cadastrados\n");
@@ -335,14 +375,15 @@ int main() {
                     if (totalClientes > 0) {
                         visualizarClientes(clientes, totalClientes);
                         blueMessage("ID Cliente: ");
-                        scanf("%d", &idRemocao);
+                        scanf("%d", &idEntrada);
                         getchar();
 
                         system(CLEAR_SCREEN);
 
-                        indiceCliente = encontrarIndiceCliente(idRemocao, clientes, totalClientes);
+                        indiceCliente = encontrarIndiceCliente(idEntrada, clientes, totalClientes);
+                        existeCliente = indiceCliente != -1;
 
-                        if (indiceCliente != -1) {
+                        if (existeCliente) {
                             permitirAcessoAdm = confirmarComCredenciais(admLogado->id, admLogado->senha);
 
                             if (permitirAcessoAdm) {
@@ -372,7 +413,9 @@ int main() {
             printf("Bem-vindo(a), %s\n", clienteLogado->nome);
 
             while (decisao != 4) {
-                printf("Créditos: %.2f\n\n", clienteLogado->credito);
+                yellowMessage("Crédito: ");
+                printf("%.2f\n\n", clienteLogado->credito);
+
                 blueMessage("1- Comprar produtos\n");
                 blueMessage("2- Visualizar produtos comprados\n");
                 blueMessage("3- Adicionar crédito\n");
@@ -520,6 +563,10 @@ void blueMessage(char message[]) {
     printf("\033[34m%s\033[0m", message);
 }
 
+void yellowMessage(char message[]){
+    printf("\033[1;33m%s\033[0m", message);
+}
+
 //funções de adm
 int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms) {
     int validacao = FALSE;
@@ -621,18 +668,23 @@ int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes) {
 }
 
 void visualizarClientes(Cliente clientes[], int totalClientes) {
-    int produtosComprados;
     for (int i = 0; i < totalClientes; i++) {
-        produtosComprados = contarProdutosComprados(clientes[i].produtosComprados);
-
         printf("Id: %d\n", clientes[i].id);
         printf("Nome: %s\n", clientes[i].nome);
-        printf("Senha: %s\n", clientes[i].senha);
-        printf("Produtos comprados: %d\n", produtosComprados);
-        printf("Crédito: %.2f\n", clientes[i].credito);
         separar();
-    }
-    
+    }   
+}
+
+void visualizarDetalhesCliente(Cliente cliente) {
+    int totalComprados;
+    totalComprados = contarProdutosComprados(cliente.produtosComprados);
+
+    printf("Id: %d\n", cliente.id);
+    printf("Nome: %s\n", cliente.nome);
+    printf("Senha: %s\n", cliente.senha);
+    printf("Crédito: %.2f\n\n", cliente.credito);
+    printf("Comprados (%d):\n\n", totalComprados);
+    visualizarProdutos(cliente.produtosComprados, totalComprados);
 }
 
 Cliente criarCliente() {
@@ -732,6 +784,20 @@ int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos
     }
     
     return indice;
+}
+
+int verificacaoCodigoProduto(int codEntrada, Produto produtos[], int totalProdutos) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalProdutos) && (validacao == FALSE)) {
+        if (produtos[i].codigo == codEntrada) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
 }
 
 void visualizarProdutos(Produto produtos[], int totalProdutos) {
