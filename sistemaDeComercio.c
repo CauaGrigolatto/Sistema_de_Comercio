@@ -21,7 +21,6 @@ typedef struct Produto {
 } Produto;
 
 typedef struct Administrador {
-    int adm;
     int id;
     char nome[30];
     char senha[30];
@@ -29,7 +28,6 @@ typedef struct Administrador {
 
 
 typedef struct Cliente {
-    int adm;
     int id;
     char nome[30];
     char senha[30];
@@ -97,6 +95,8 @@ int main() {
 
     int idLogin;
     char senhaLogin[30];
+
+    int idRemocao;
 
     int indiceAdm;
     int indiceCliente;
@@ -224,6 +224,7 @@ int main() {
 
                     idValido = verificacaoIdCliente(idLogin, clientes, totalClientes);
                     senhaValida = verificacaoSenhaCliente(senhaLogin, clientes, totalClientes);
+
                     permitirAcessoCliente = idValido && senhaValida;
                     
                     if (permitirAcessoCliente) {    
@@ -278,18 +279,28 @@ int main() {
                 
                 }
                 else if (decisao == 2) {
-                    visualizarProdutos(produtos, totalProdutos);
+                    if (totalProdutos > 0) {
+                        visualizarProdutos(produtos, totalProdutos);
+                    }
+                    else {
+                        redMessage("Não há produtos cadastrados\n");
+                    }
                 }
                 else if (decisao == 3) {
 
                     if (totalProdutos > 0) {
                         redMessage("Excluir produto:\n");
                         visualizarProdutos(produtos, totalProdutos);
-                        scanf("%d", &decisao);
+                        blueMessage("Cód. produto: ");
+                        scanf("%d", &idRemocao);
                         getchar();
 
-                        removerProduto(produtos, decisao);
+                        system(CLEAR_SCREEN);
+
+                        indiceProduto = encontrarIndiceProduto(idRemocao, produtos, totalProdutos);
+                        removerProduto(produtos, indiceProduto);
                         totalProdutos--;    
+                        greenMessage("Produto removido\n");
                     }
                     else {
                         redMessage("Não há produtos cadastrados\n");
@@ -308,11 +319,16 @@ int main() {
                     
                     if (totalClientes > 0) {
                         visualizarClientes(clientes, totalClientes);
-                        scanf("%d", &decisao);
+                        blueMessage("ID Cliente: ");
+                        scanf("%d", &idRemocao);
                         getchar();
 
-                        removerCliente(clientes, decisao);
+                        system(CLEAR_SCREEN);
+
+                        indiceCliente = encontrarIndiceCliente(idRemocao, clientes, totalClientes);
+                        removerCliente(clientes, indiceCliente);
                         totalClientes--;
+                        greenMessage("Cliente removido\n");
                     }
                     else {
                         redMessage("Não há clientes cadastrados\n");
@@ -445,15 +461,12 @@ Administrador criarAdministrador() {
     scanf("%[^\n]", novoAdm.senha);
     getchar();
   
-    novoAdm.adm = TRUE;
-
     return novoAdm;
 }
 
 Administrador copiarAdm(Administrador adms[], int indice) {
     Administrador admCopia;
 
-    admCopia.adm = adms[indice].adm;
     admCopia.id = adms[indice].id;
     strcpy(admCopia.nome, adms[indice].nome);
     strcpy(admCopia.senha, adms[indice].senha);
@@ -509,7 +522,6 @@ void visualizarClientes(Cliente clientes[], int totalClientes) {
     for (int i = 0; i < totalClientes; i++) {
         produtosComprados = contarProdutosComprados(clientes[i].produtosComprados);
 
-        printf("Adm: %d\n", clientes[i].adm);
         printf("Id: %d\n", clientes[i].id);
         printf("Nome: %s\n", clientes[i].nome);
         printf("Senha: %s\n", clientes[i].senha);
@@ -534,8 +546,6 @@ Cliente criarCliente() {
     scanf("%[^\n]", novoCliente.senha);
     getchar();
   
-    novoCliente.adm = FALSE;
-
     return novoCliente;
 }
 
@@ -550,13 +560,11 @@ void removerCliente(Cliente clientes[], int indice) {
             i++;
         }
 
-        clientes[i].adm = 0;
         clientes[i].id = 0;
         strcpy(clientes[i].nome, "");
         strcpy(clientes[i].senha, "");
     }
     else {
-        clientes[indice].adm = 0;
         clientes[indice].id = 0;
         strcpy(clientes[indice].nome, "");
         strcpy(clientes[indice].senha, "");
@@ -566,7 +574,6 @@ void removerCliente(Cliente clientes[], int indice) {
 Cliente copiarCliente(Cliente clientes[], int indice) {
     Cliente clienteCopia;
 
-    clienteCopia.adm = clientes[indice].adm;
     clienteCopia.id = clientes[indice].id;
     strcpy(clienteCopia.nome, clientes[indice].nome);
     strcpy(clienteCopia.senha, clientes[indice].senha);
