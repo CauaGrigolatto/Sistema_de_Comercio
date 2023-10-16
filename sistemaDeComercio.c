@@ -36,6 +36,7 @@ typedef struct Cliente {
 } Cliente;
 
 //funções extras
+int ehIdValido(int id);
 int confirmarComCredenciais(int idEntrada, char senhaEntrada[]);
 void redMessage(char message[]);
 void greenMessage(char message[]);
@@ -50,7 +51,7 @@ Administrador copiarAdm(Administrador adms[], int indice);
 int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms);
 
 //funções clientes
-int creditoValido(float valor);
+int ehCreditoValido(float valor);
 void removerCliente(Cliente usuarios[], int indice);
 Cliente copiarCliente(Cliente usuarios[], int indice);
 Cliente criarCliente();
@@ -146,17 +147,18 @@ int main() {
 
                 novoAdm = criarAdministrador();
                 existeAdm = verificacaoIdAdm(novoAdm.id, administradores, totalAdms);
+                idValido = ehIdValido(novoAdm.id);
 
                 system(CLEAR_SCREEN);
 
-                if (existeAdm == FALSE) {
+                if ((existeAdm == FALSE) && (idValido)) {
                     administradores[totalAdms] = novoAdm;
                     totalAdms++;
 
                     greenMessage("Administrador cadastrado com sucesso!\n\n"); 
                 }
                 else {
-                    redMessage("ID já cadastrado\n\n");
+                    redMessage("ID inválido\n\n");
                 }
             
             }
@@ -165,10 +167,11 @@ int main() {
 
                 novoCliente = criarCliente();
                 existeCliente = verificacaoIdCliente(novoCliente.id, clientes, totalAdms);
+                idValido = ehIdValido(novoCliente.id);
 
                 system(CLEAR_SCREEN);
 
-                if (existeCliente == FALSE) {
+                if ((existeCliente == FALSE) && (idValido)) {
 
                     clientes[totalClientes] = novoCliente;
                     totalClientes++;
@@ -176,7 +179,7 @@ int main() {
                     greenMessage("Cliente cadastrado com sucesso!\n\n");
                 }
                 else {
-                    redMessage("ID já cadastrado\n\n");
+                    redMessage("ID inválido\n\n");
                 }
             }
             else {
@@ -291,16 +294,17 @@ int main() {
 
                     novoProduto = criarProduto();
                     existeProduto = verificacaoCodigoProduto(novoProduto.codigo, produtos, totalProdutos);
+                    idValido = ehIdValido(novoProduto.codigo);
 
                     system(CLEAR_SCREEN);
 
-                    if (existeProduto == FALSE) {
+                    if ((existeProduto == FALSE) && (idValido)) {
                         cadastrarProduto(produtos, totalProdutos, novoProduto);
                         totalProdutos++;
                         greenMessage("Novo produto cadastrado!\n\n");
                     }
                     else {
-                        redMessage("Código já cadastrado\n\n");
+                        redMessage("Código inválido\n\n");
                     }
 
                 }
@@ -435,9 +439,9 @@ int main() {
             }
         }
         else if (permitirAcessoCliente) {
+            printf("Bem-vindo(a), %s\n", clienteLogado->nome);
 
             while (decisao != 4) {
-                printf("Bem-vindo(a), %s\n", clienteLogado->nome);
                 yellowMessage("Crédito: ");
                 printf("%.2f\n\n", clienteLogado->credito);
 
@@ -529,7 +533,7 @@ int main() {
 
                         system(CLEAR_SCREEN);
 
-                        if (creditoValido(credito)) {
+                        if (ehCreditoValido(credito)) {
                             clienteLogado->credito += credito;
                             greenMessage("Crédito adicionado\n\n");
                         }
@@ -558,7 +562,12 @@ int main() {
 }
 
 //funções extras
-int creditoValido(float valor) {
+int ehIdValido(int id) {
+    return id > 0;
+}
+
+
+int ehCreditoValido(float valor) {
     return valor >= 0;
 }
 
