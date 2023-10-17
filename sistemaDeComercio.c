@@ -166,7 +166,7 @@ int main() {
                 blueMessage("Cadastro de cliente\n\n");
 
                 novoCliente = criarCliente();
-                existeCliente = verificacaoIdCliente(novoCliente.id, clientes, totalAdms);
+                existeCliente = verificacaoIdCliente(novoCliente.id, clientes, totalClientes);
                 idValido = ehIdValido(novoCliente.id);
 
                 system(CLEAR_SCREEN);
