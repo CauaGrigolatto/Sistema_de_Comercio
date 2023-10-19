@@ -327,7 +327,7 @@ int main() {
                 showSubtitle(message, colorMessage);
 
                 blueMessage("[1] "); printf("Cadastrar produto\n");
-                blueMessage("[2] "); printf("Visualizar prodtuos\n");
+                blueMessage("[2] "); printf("Visualizar produtuos\n");
                 blueMessage("[3] "); printf("Excluir produto\n");
                 blueMessage("[4] "); printf("Visualizar clientes\n");
                 blueMessage("[5] "); printf("Excluir cliente\n");
