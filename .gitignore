@@ -51,5 +51,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Tests
+# Others
 testes.c
+tempCodeRunnerFile.c

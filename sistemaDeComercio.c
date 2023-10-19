@@ -36,6 +36,15 @@ typedef struct Cliente {
 } Cliente;
 
 //funções extras
+void showErrorMessage(char messageVariable[], char text);
+void showSuccessMessage(char messageVariable[], char text);
+
+void showSubtitle(char message[], char colorMessage[]);
+void showMainTitle(char title[], char colorTitle[]);
+void showOptions(char options[][50]);
+void showColorfulText(char text[], char color[]);
+int countOptions(char choices[][50]);
+
 int ehIdValido(int id);
 int confirmarComCredenciais(int idEntrada, char senhaEntrada[]);
 void redMessage(char message[]);
@@ -88,6 +97,11 @@ int main() {
     Cliente *clienteLogado;
     Administrador *admLogado;
 
+    char message[50];
+    char colorMessage[10]; 
+    strcpy(message, "");
+    strcpy(colorMessage, "blue");
+
     int totalAdms = 0;
     int totalClientes = 0;
     int totalProdutos = 0;
@@ -125,24 +139,37 @@ int main() {
         permitirAcessoAdm = FALSE;
         permitirAcessoCliente = FALSE;
 
-        blueMessage("1- Cadastrar\n");
-        blueMessage("2- Entrar\n");
-        blueMessage("3- Sair\n");
+        showMainTitle("Sistema de Comércio", "blue");
+        showSubtitle(message, colorMessage);
+
+        blueMessage("[1] "); printf("Cadastrar\n");
+        blueMessage("[2] "); printf("Entrar\n");
+        blueMessage("[3] "); printf("Sair\n\n");
+
         scanf("%d", &decisao);
+        strcpy(message, "");
+
         
         system(CLEAR_SCREEN);
  
         if (decisao == 1) {
-            blueMessage("Escolha uma das opções de cadastro\n\n");
 
-            blueMessage("1- Cadastrar administrador\n");
-            blueMessage("2- Cadastrar cliente\n");
+            showMainTitle("Cadastrar", "blue");
+            showSubtitle("Escolha uma opção de cadastro", "blue");
+
+            blueMessage("[1] "); printf("Cadastrar administrador\n");
+            blueMessage("[2] "); printf("Cadastrar cliente\n\n");
+            
+            
             scanf("%d", &decisao);
+            strcpy(message, "");
+
 
             system(CLEAR_SCREEN);
 
             if (decisao == 1) {
-                blueMessage("Cadastro de administrador\n\n");
+                showMainTitle("Cadastrar adminstrador", "blue");
+                showSubtitle("Preencha os campos e cadastre um ADM", "blue");
 
 
                 novoAdm = criarAdministrador();
@@ -155,15 +182,18 @@ int main() {
                     administradores[totalAdms] = novoAdm;
                     totalAdms++;
 
-                    greenMessage("Administrador cadastrado com sucesso!\n\n"); 
+                    strcpy(message, "Administrador cadastrado com sucesso!");
+                    strcpy(colorMessage, "green"); 
                 }
                 else {
-                    redMessage("ID inválido\n\n");
+                    strcpy(message, "ID inválido!");
+                    strcpy(colorMessage, "red");
                 }
             
             }
             else if (decisao == 2) {
-                blueMessage("Cadastro de cliente\n\n");
+                showMainTitle("Cadastrar cliente", "blue");
+                showSubtitle("Preencha os campos e cadastre um cliente", "blue");
 
                 novoCliente = criarCliente();
                 existeCliente = verificacaoIdCliente(novoCliente.id, clientes, totalClientes);
@@ -176,14 +206,17 @@ int main() {
                     clientes[totalClientes] = novoCliente;
                     totalClientes++;
 
-                    greenMessage("Cliente cadastrado com sucesso!\n\n");
+                    strcpy(message, "Cliente cadastrado!");
+                    strcpy(colorMessage, "green");
                 }
                 else {
-                    redMessage("ID inválido\n\n");
+                    strcpy(message, "ID inválido!");
+                    strcpy(colorMessage, "red");
                 }
             }
             else {
-                redMessage("Opção inválida\n\n");
+                strcpy(message, "Opção inválida!");
+                strcpy(colorMessage, "red");
                 decisao = 0;
             }
         }
@@ -192,16 +225,20 @@ int main() {
             existeCliente = totalClientes != 0;
             
             if (existeAdm || existeCliente) {
-                blueMessage("Escolha uma das opções de entrada\n\n");
-
-                blueMessage("1- Entrar como administrador\n");
-                blueMessage("2- Entrar como cliente\n");
+                showMainTitle("Entrar", "blue");
+                showSubtitle("Escolha uma opção de entrada", "blue");
+                
+                blueMessage("[1] "); printf("Entrar como ADM\n");
+                blueMessage("[2] "); printf("Entrar como cliente\n\n");
+                
                 scanf("%d", &decisao);
+                strcpy(message, "");
 
                 system(CLEAR_SCREEN);
 
                 if ((decisao == 1) && existeAdm) {
-                    blueMessage("Entrar como adminstrador\n\n");
+                    showMainTitle("Entrar como ADM", "blue");
+                    showSubtitle("Preencha os campos para entrar como ADM", "blue");
 
                     blueMessage("ID: ");
                     scanf("%d", &idLogin);
@@ -222,14 +259,17 @@ int main() {
                         indiceAdm = encontrarIndiceAdm(idLogin, administradores, totalAdms);
                         admLogado = &administradores[indiceAdm];
 
-                        greenMessage("Você entrou como administrador\n");
+                        strcpy(message, "Entrou como ADM!");
+                        strcpy(colorMessage, "green");
                     }
                     else {
-                        redMessage("ID ou senha incorretos\n\n");
+                        strcpy(message, "ID ou senha inválidos!");
+                        strcpy(colorMessage, "red");
                     }
                 }
                 else if ((decisao == 2) && existeCliente) {
-                    blueMessage("Entrar como cliente\n\n");
+                    showMainTitle("Entrar como cliente", "blue");
+                    showSubtitle("Preencha os campos para entrar como cliente", "blue");
 
                     blueMessage("ID: ");
                     scanf("%d", &idLogin);
@@ -250,20 +290,24 @@ int main() {
                         indiceCliente = encontrarIndiceCliente(idLogin, clientes, totalClientes);
                         clienteLogado = &clientes[indiceCliente];
 
-                        greenMessage("Você entrou como cliente\n");
+                        strcpy(message, "Entrou como cliente!");
+                        strcpy(colorMessage, "green");
                     }
                     else {
-                        redMessage("ID ou senha incorretos\n\n");
+                        strcpy(message, "ID ou senha inválidos!");
+                        strcpy(colorMessage, "red");
                     }
 
                 }
                 else {
-                    redMessage("Não há cadastros\n\n");    
+                    strcpy(message, "Não há cadastros!");
+                    strcpy(colorMessage, "red");
                     decisao = 0;
                 }
             }
             else {
-                redMessage("Não há cadastros\n\n");
+                strcpy(message, "Não há cadastros!");
+                strcpy(colorMessage, "red");
             }
         }
         else if (decisao == 3) {
@@ -271,26 +315,32 @@ int main() {
             blueMessage("Bye\n");
         }
         else {
-            redMessage("Opção inválida\n\n");
+            strcpy(message, "Opção inválida!");
+            strcpy(colorMessage, "red");
         }
 
         if (permitirAcessoAdm) {
-            printf("Bem-vindo(a), %s\n\n", admLogado->nome);
-
             while (decisao != 6) {
-                blueMessage("1- Cadastrar produto\n");
-                blueMessage("2- Visualizar produtos\n");
-                blueMessage("3- Remover produto\n");
-                blueMessage("4- Visualizar clientes\n");
-                blueMessage("5- Remover cliente\n");
-                blueMessage("6- Sair da conta\n");
+
+                showMainTitle("Administrador", "blue");
+                showSubtitle(admLogado->nome, "blue");
+                showSubtitle(message, colorMessage);
+
+                blueMessage("[1] "); printf("Cadastrar produto\n");
+                blueMessage("[2] "); printf("Visualizar prodtuos\n");
+                blueMessage("[3] "); printf("Excluir produto\n");
+                blueMessage("[4] "); printf("Visualizar clientes\n");
+                blueMessage("[5] "); printf("Excluir cliente\n");
+                blueMessage("[6] "); printf("Sair da conta\n\n");
+
                 scanf("%d", &decisao);
                 getchar();
+                strcpy(message, "");
 
                 system(CLEAR_SCREEN);
 
                 if (decisao == 1) {
-                    blueMessage("Cadastro de produto\n\n");
+                    showMainTitle("Cadastrar produto", "blue");
 
                     novoProduto = criarProduto();
                     existeProduto = verificacaoCodigoProduto(novoProduto.codigo, produtos, totalProdutos);
@@ -301,31 +351,36 @@ int main() {
                     if ((existeProduto == FALSE) && (idValido)) {
                         cadastrarProduto(produtos, totalProdutos, novoProduto);
                         totalProdutos++;
-                        greenMessage("Novo produto cadastrado!\n\n");
+                        strcpy(message, "Produto cadastrado!");
+                        strcpy(colorMessage, "green");
                     }
                     else {
-                        redMessage("Código inválido\n\n");
+                        strcpy(message, "Código inválido!");
+                        strcpy(colorMessage, "red");
                     }
 
                 }
                 else if (decisao == 2) {
                     if (totalProdutos > 0) {
+                        showMainTitle("Produtos cadastrados", "blue");
                         listarProdutos(produtos, totalProdutos);
                         yellowMessage("Pressione ENTER para voltar\n");
                         getchar();
                         system(CLEAR_SCREEN);
                     }
                     else {
-                        redMessage("Não há produtos cadastrados\n\n");
+                        strcpy(message, "Não há produtos cadastrados!");
+                        strcpy(colorMessage, "red");
                     }
                 }
                 else if (decisao == 3) {
 
                     if (totalProdutos > 0) {
-                        blueMessage("Excluir produto:\n\n");
+                        showMainTitle("Excluir produto", "red");
                         listarProdutos(produtos, totalProdutos);
                         blueMessage("Cód. produto: ");
                         scanf("%d", &idEntrada);
+                        strcpy(message, "");
                         getchar();
 
                         system(CLEAR_SCREEN);
@@ -339,32 +394,43 @@ int main() {
                             if (permitirAcessoAdm) {
                                 removerProduto(produtos, indiceProduto);
                                 totalProdutos--;    
-                                greenMessage("Produto removido\n\n");
+                                
+                                strcpy(message, "Produto excluído!");
+                                strcpy(colorMessage, "green");
                             }
                             else {
-                                redMessage("ID ou senha incorretos\n\n");
+                                strcpy(message, "ID ou senha inválidos!");
+                                strcpy(colorMessage, "red");
                             }
                         }
                         else {
-                            redMessage("Código inválido\n\n");
+                            strcpy(message, "Código inválido!");
+                            strcpy(colorMessage, "red");
                         }
                     }
                     else {
-                        redMessage("Não há produtos cadastrados\n\n");
+                        strcpy(message, "Não há produtos cadastrados!");
+                        strcpy(colorMessage, "red");
                     }
 
                 }
                 else if (decisao == 4) {
                     if (totalClientes > 0){
+                        showMainTitle("Visualizar clientes", "blue");
                         listarClientes(clientes, totalClientes);
 
-                        blueMessage("1- Visualizar cliente com detalhes\n");
-                        blueMessage("2- Voltar\n");
+                        blueMessage("[1] "); printf("Visualizar cliente com detalhes\n");
+                        blueMessage("[2] "); printf("Voltar\n\n");
+
                         scanf("%d", &decisao);
+                        strcpy(message, "");
 
                         system(CLEAR_SCREEN);
 
                         if (decisao == 1) {
+                            showMainTitle("Visualizar com detalhes", "blue");
+                            showSubtitle("Informe o ID da conta para ver detalhes", "blue");
+
                             listarClientes(clientes, totalClientes);
                             blueMessage("ID Cliente: ");
                             scanf("%d", &idEntrada);
@@ -376,6 +442,7 @@ int main() {
                             existeCliente = indiceCliente != -1;
 
                             if (existeCliente) {
+                                showMainTitle("Detalhes da conta", "blue");
                                 novoCliente = clientes[indiceCliente];
                                 visualizarDetalhesCliente(novoCliente);
 
@@ -384,21 +451,24 @@ int main() {
                                 system(CLEAR_SCREEN);
                             }
                             else {
-                                redMessage("ID inválido\n\n");
+                                strcpy(message, "ID inválido!");
+                                strcpy(colorMessage, "red");
                             }
                         }
                         else if (decisao != 2){
-                            redMessage("Opção inválida\n\n");
+                            strcpy(message, "Opção inválida!");
+                            strcpy(colorMessage, "red");
                         }   
                     }
                     else {
-                        redMessage("Não há clientes cadastrados\n\n");
+                        strcpy(message, "Não há clientes cadastrados!");
+                        strcpy(colorMessage, "red");
                     }
                 }
                 else if (decisao == 5) {
                     
                     if (totalClientes > 0) {
-                        blueMessage("Excluir cliente\n\n");
+                        showMainTitle("Excluir cliente", "red");
                         listarClientes(clientes, totalClientes);
                         blueMessage("ID Cliente: ");
                         scanf("%d", &idEntrada);
@@ -415,50 +485,64 @@ int main() {
                             if (permitirAcessoAdm) {
                                 removerCliente(clientes, indiceCliente);
                                 totalClientes--;
-                                greenMessage("Cliente removido\n\n");
+                                
+                                strcpy(message, "Cliente removido!");
+                                strcpy(colorMessage, "green");
                             }
                             else {
-                                redMessage("ID ou senha incorretos\n\n");
+                                strcpy(message, "ID ou senha inválidos!");
+                                strcpy(colorMessage, "red");
                             }
                         }
                         else {
-                            redMessage("ID inválido\n\n");
+                            strcpy(message, "ID inválido!");
+                            strcpy(colorMessage, "red");
                         }
                     }
                     else {
-                        redMessage("Não há clientes cadastrados\n\n");
+                        strcpy(message, "Não há clientes cadastrados!");
+                        strcpy(colorMessage, "red");
                     }
 
                 }
                 else if (decisao == 6) {
-                    redMessage("Saiu da conta\n\n");
+                    strcpy(message, "Saiu da conta!");
+                    strcpy(colorMessage, "red");
                 }
                 else {
-                    redMessage("Opção inválida\n\n");
+                    strcpy(message, "Opção inválida!");
+                    strcpy(colorMessage, "red");
                 }
             }
         }
         else if (permitirAcessoCliente) {
-            printf("Bem-vindo(a), %s\n", clienteLogado->nome);
 
             while (decisao != 4) {
+                showMainTitle("Cliente", "blue");
+                showSubtitle(clienteLogado->nome, "blue");
+                showSubtitle(message, colorMessage);
+
+                blueMessage("[1] "); printf("Comprar produtos\n");
+                blueMessage("[2] "); printf("Meus pedidos\n");
+                blueMessage("[3] "); printf("Adicionar créditos\n");
+                blueMessage("[4] "); printf("Sair da conta\n\n");
+
                 yellowMessage("Crédito: ");
                 printf("%.2f\n\n", clienteLogado->credito);
 
-                blueMessage("1- Comprar produtos\n");
-                blueMessage("2- Visualizar produtos comprados\n");
-                blueMessage("3- Adicionar crédito\n");
-                blueMessage("4- Sair da conta\n");
                 scanf("%d", &decisao);
+                strcpy(message, "");
                 getchar();
 
                 system(CLEAR_SCREEN);
 
                 if (decisao == 1) {
                     if (totalProdutos > 0) {
+                        showMainTitle("Comprar produtos", "blue");
                         listarProdutos(produtos, totalProdutos);
                         blueMessage("Cód. produto (-1 para sair): ");
                         scanf("%d", &decisao);
+                        strcpy(message, "");
                         getchar();
 
                         system(CLEAR_SCREEN);
@@ -481,35 +565,42 @@ int main() {
                                         comprarProduto(novoProduto, clienteLogado->produtosComprados);
 
                                         clienteLogado->credito -= novoProduto.preco;
-                                        greenMessage("Produto adquirido\n\n");
+                                        
+                                        strcpy(message, "Produto adquirido!");
+                                        strcpy(colorMessage, "green");
                                     }
                                     else {
-                                        redMessage("ID ou senha inválidos\n\n");
+                                        strcpy(message, "ID ou senha inválidos!");
+                                        strcpy(colorMessage, "red");
                                     }
                                 }
                                 else {
-                                    redMessage("Créditos insuficientes\n\n");
+                                    strcpy(message, "Créditos insuficientes!");
+                                    strcpy(colorMessage, "red");
                                 } 
 
                             }
                             else {
-                                redMessage("ID inválido\n\n");
+                                strcpy(message, "ID inválido!");
+                                strcpy(colorMessage, "red");
                             }
 
                         }
                         else if (decisao == -1) {
-                            redMessage("Compra cancelada\n\n");
+                            strcpy(message, "Compra cancelada!");
+                            strcpy(colorMessage, "red");
                         }
                     }
                     else {
-                        redMessage("Não há produtos cadastrados\n\n");
+                        strcpy(message, "Não há produtos cadastrados!");
+                        strcpy(colorMessage, "red");
                     }
                 } 
                 else if (decisao == 2) {
                     totalComprados = contarProdutosComprados(clienteLogado->produtosComprados);
                     
                     if (totalComprados > 0) {
-                        blueMessage("Produtos comprados\n\n");
+                        showMainTitle("Produtos comprados", "blue");
                         listarProdutos(clienteLogado->produtosComprados, totalComprados);
                         
                         yellowMessage("Pressione ENTER para voltar\n");
@@ -517,7 +608,8 @@ int main() {
                         system(CLEAR_SCREEN);
                     }
                     else {
-                        redMessage("Você ainda não comprou nenhum produto\n\n");
+                        strcpy(message, "Nenhum produto comprado!");
+                        strcpy(colorMessage, "red");
                     }
                 }
                 else if (decisao == 3) {
@@ -526,31 +618,39 @@ int main() {
                     permitirAcessoCliente = confirmarComCredenciais(clienteLogado->id, clienteLogado->senha);
 
                     if (permitirAcessoCliente){
-                        blueMessage("Adicionar crédito\n\n");
+                        showMainTitle("Adiconar créditos", "blue");
+                        showSubtitle("Adicione créditos realizar compras", "blue");
 
                         blueMessage("Informe valor: ");
                         scanf("%f", &credito);
+                        strcpy(message, "");
 
                         system(CLEAR_SCREEN);
 
                         if (ehCreditoValido(credito)) {
                             clienteLogado->credito += credito;
-                            greenMessage("Crédito adicionado\n\n");
+
+                            strcpy(message, "Crédito adicionado!");
+                            strcpy(colorMessage, "green");
                         }
                         else {
-                            redMessage("Valor inválido\n\n");
+                            strcpy(message, "Valor inválido!");
+                            strcpy(colorMessage, "red");
                         }
                     }
                     else {
-                        redMessage("ID ou senha inválidos\n\n");
+                        strcpy(message, "ID ou senha inválidos!");
+                        strcpy(colorMessage, "red");
                     }
 
                 }
                 else if (decisao == 4) {
-                    redMessage("Saiu da conta\n\n");
+                    strcpy(message, "Saiu da conta!");
+                    strcpy(colorMessage, "red");
                 }
                 else {
-                    redMessage("Opção inválida\n\n");
+                    strcpy(message, "Opção inválida!");
+                    strcpy(colorMessage, "red");
                 }
             }
 
@@ -562,6 +662,47 @@ int main() {
 }
 
 //funções extras
+void showMainTitle(char title[], char titleColor[]) {
+    printf("---------------------------------------------\n\n");
+    showColorfulText(title, titleColor);
+    printf("\n---------------------------------------------\n");
+}
+
+void showSubtitle(char message[], char colorMessage[]) {
+    showColorfulText(message, colorMessage);
+    printf("---------------------------------------------\n");
+}
+
+void showColorfulText(char text[], char color[]) {
+    if (strcmp(color, "red") == 0) {
+        printf("\033[31m%s\033[0m\n", text);
+    }
+    else if (strcmp(color, "green") == 0) {
+        printf("\033[32m%s\033[0m\n", text);
+    }
+    else if (strcmp(color, "blue") == 0) {
+        printf("\033[34m%s\033[0m\n", text);
+    }
+}
+
+void showOptions(char options[][50]) {
+    int totalOptions = countOptions(options);
+
+    for (int i = 0; i < totalOptions; i++) {
+        printf("[%d] %s\n", (i+1), options[i]);    
+    }
+}
+
+int countOptions(char choices[][50]) {
+    int i = 0;
+
+    while (choices[i][0] != '\0') {
+        i++;
+    }
+    
+    return i;
+}
+
 int ehIdValido(int id) {
     return id > 0;
 }
@@ -577,7 +718,7 @@ int confirmarComCredenciais(int idEntrada, char senhaEntrada[]) {
 
     int idValido, senhaValida, permitirAcesso;
 
-    redMessage("Confirme suas credenciais para prosseguir\n\n");
+    showMainTitle("Confirmar credenciais", "blue");
 
     blueMessage("ID: ");
     scanf("%d", &idLogin);
@@ -913,8 +1054,5 @@ Produto criarProduto() {
 }
 
 void separar() {
-    for (int i = 0; i < 35; i++) {
-        printf(".");
-    }
-    printf("\n");
+    printf("---------------------------------------------\n");
 }
