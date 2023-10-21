@@ -35,55 +35,49 @@ typedef struct Cliente {
     float credito;
 } Cliente;
 
-//funções extras
-void showErrorMessage(char messageVariable[], char text);
-void showSuccessMessage(char messageVariable[], char text);
-
-void showSubtitle(char message[], char colorMessage[]);
+//funções de interface
 void showMainTitle(char title[], char colorTitle[]);
-void showOptions(char options[][50]);
+void showSubtitle(char message[], char colorMessage[]);
 void showColorfulText(char text[], char color[]);
-int countOptions(char choices[][50]);
-
-int confirmarComCredenciais(int idEntrada, char senhaEntrada[]);
-int validarId(int idEntrada);
-int validarSenha(char senhaEntrada[]);
-
-int ehIdValido(int id);
 void redMessage(char message[]);
 void greenMessage(char message[]);
 void blueMessage(char message[]);
 void yellowMessage(char message[]);
+void separar();
+
+//funções flags
+int confirmarComCredenciais(int idEntrada, char senhaEntrada[]);
+int validarId(int idEntrada);
+int validarSenha(char senhaEntrada[]);
+int ehIdValido(int id);
+int ehCreditoValido(float valor);
 
 //funções de adm
 Administrador criarAdministrador();
-int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms);
 int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms);
+int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms);
 int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms);
 
-//funções clientes
-int ehCreditoValido(float valor);
+//funções de clientes
+Cliente criarCliente();
+int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
+int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
 void removerCliente(Cliente usuarios[], int indice);
 void resetarCliente(Cliente *cliente);
-Cliente criarCliente();
 void listarClientes(Cliente usuarios[], int totalUsuarios);
 void visualizarDetalhesCliente(Cliente cliente);
 int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes);
-int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes);
-int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes);
 
 //funções produtos
-int contarProdutosComprados(Produto produtos[]);
+Produto criarProduto();
 void comprarProduto(Produto produto, Produto produtosComprados[]);
-int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos);
+int contarProdutosComprados(Produto produtos[]);
 void removerProduto(Produto produtos[], int indice);
 void resetarProduto(Produto *produto);
+int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos);
 void listarProdutos(Produto produtos[], int totalProdutos);
 int ehCodigoExistente(int codEntrada, Produto produtos[], int totalProdutos);
 void cadastrarProduto(Produto produtos[], int indice, Produto produto);
-Produto criarProduto();
-
-void separar();
 
 int main() {
     system(CLEAR_SCREEN);
@@ -98,7 +92,6 @@ int main() {
 
     Cliente *clienteLogado;
     Administrador *admLogado;
-
 
     int totalAdms = 0;
     int totalClientes = 0;
@@ -653,7 +646,7 @@ int main() {
     return 0;
 }
 
-//funções extras
+//funções de interface
 void showMainTitle(char title[], char titleColor[]) {
     printf("---------------------------------------------\n\n");
     showColorfulText(title, titleColor);
@@ -677,14 +670,29 @@ void showColorfulText(char text[], char color[]) {
     }
 }
 
-int ehIdValido(int id) {
-    return id > 0;
+void redMessage(char message[]) {
+    printf("\033[1;31m%s\033[1;31m", message);
+    printf("\033[0m");
 }
 
-int ehCreditoValido(float valor) {
-    return valor >= 0;
+void greenMessage(char message[]) {
+    printf("\033[1;32m%s\033[1;32m", message);
+    printf("\033[0m");
 }
 
+void blueMessage(char message[]) {
+    printf("\033[34m%s\033[0m", message);
+}
+
+void yellowMessage(char message[]){
+    printf("\033[1;33m%s\033[0m", message);
+}
+
+void separar() {
+    printf("---------------------------------------------\n");
+}
+
+//funções flags
 int confirmarComCredenciais(int idEntrada, char senhaEntrada[]) {
     int idValido, senhaValida, permitirAcesso;
 
@@ -720,26 +728,33 @@ int validarSenha(char senhaEntrada[]) {
     return (strcmp(senhaLogin, senhaEntrada) == 0);
 }
 
-//mensagens de cor
-void redMessage(char message[]) {
-    printf("\033[1;31m%s\033[1;31m", message);
-    printf("\033[0m");
+int ehIdValido(int id) {
+    return id > 0;
 }
 
-void greenMessage(char message[]) {
-    printf("\033[1;32m%s\033[1;32m", message);
-    printf("\033[0m");
-}
-
-void blueMessage(char message[]) {
-    printf("\033[34m%s\033[0m", message);
-}
-
-void yellowMessage(char message[]){
-    printf("\033[1;33m%s\033[0m", message);
+int ehCreditoValido(float valor) {
+    return valor >= 0;
 }
 
 //funções de adm
+Administrador criarAdministrador() {
+    Administrador novoAdm;
+    
+    blueMessage("Id: ");
+    scanf("%d", &novoAdm.id);
+    getchar();
+
+    blueMessage("Nome: ");
+    scanf("%[^\n]", novoAdm.nome);
+    getchar();
+
+    blueMessage("Senha: ");
+    scanf("%[^\n]", novoAdm.senha);
+    getchar();
+  
+    return novoAdm;
+}
+
 int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms) {
     int validacao = FALSE;
     int i = 0;
@@ -768,24 +783,6 @@ int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAd
     return validacao;
 }
 
-Administrador criarAdministrador() {
-    Administrador novoAdm;
-    
-    blueMessage("Id: ");
-    scanf("%d", &novoAdm.id);
-    getchar();
-
-    blueMessage("Nome: ");
-    scanf("%[^\n]", novoAdm.nome);
-    getchar();
-
-    blueMessage("Senha: ");
-    scanf("%[^\n]", novoAdm.senha);
-    getchar();
-  
-    return novoAdm;
-}
-
 int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms) {
     int indice = -1;
     int i = 0;
@@ -801,54 +798,6 @@ int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms) {
 }
 
 //funções de clientes
-int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalClientes) && (validacao == FALSE)) {
-        if (strcmp(senhaEntrada, clientes[i].senha) == 0) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
-int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalClientes) && (validacao == FALSE)) {
-        if (clientes[i].id == idEntrada) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
-void listarClientes(Cliente clientes[], int totalClientes) {
-    for (int i = 0; i < totalClientes; i++) {
-        printf("Id: %d\n", clientes[i].id);
-        printf("Nome: %s\n", clientes[i].nome);
-        separar();
-    }   
-}
-
-void visualizarDetalhesCliente(Cliente cliente) {
-    int totalComprados;
-    totalComprados = contarProdutosComprados(cliente.produtosComprados);
-
-    printf("Id: %d\n", cliente.id);
-    printf("Nome: %s\n", cliente.nome);
-    printf("Senha: %s\n", cliente.senha);
-    printf("Crédito: %.2f\n\n", cliente.credito);
-    printf("Comprados (%d):\n\n", totalComprados);
-    listarProdutos(cliente.produtosComprados, totalComprados);
-}
-
 Cliente criarCliente() {
     Cliente novoCliente;
     
@@ -867,6 +816,34 @@ Cliente criarCliente() {
     novoCliente.credito = 0;
   
     return novoCliente;
+}
+
+int verificacaoIdCliente(int idEntrada, Cliente clientes[], int totalClientes) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalClientes) && (validacao == FALSE)) {
+        if (clientes[i].id == idEntrada) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
+}
+
+int verificacaoSenhaCliente(char senhaEntrada[30], Cliente clientes[], int totalClientes) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalClientes) && (validacao == FALSE)) {
+        if (strcmp(senhaEntrada, clientes[i].senha) == 0) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
 }
 
 void removerCliente(Cliente clientes[], int indice) {
@@ -894,6 +871,26 @@ void resetarCliente(Cliente *cliente) {
     cliente->credito = 0;
 }
 
+void listarClientes(Cliente clientes[], int totalClientes) {
+    for (int i = 0; i < totalClientes; i++) {
+        printf("Id: %d\n", clientes[i].id);
+        printf("Nome: %s\n", clientes[i].nome);
+        separar();
+    }   
+}
+
+void visualizarDetalhesCliente(Cliente cliente) {
+    int totalComprados;
+    totalComprados = contarProdutosComprados(cliente.produtosComprados);
+
+    printf("Id: %d\n", cliente.id);
+    printf("Nome: %s\n", cliente.nome);
+    printf("Senha: %s\n", cliente.senha);
+    printf("Crédito: %.2f\n\n", cliente.credito);
+    printf("Comprados (%d):\n\n", totalComprados);
+    listarProdutos(cliente.produtosComprados, totalComprados);
+}
+
 int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes) {
     int indiceCliente = -1;
     int i = 0;
@@ -909,6 +906,29 @@ int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes)
 }
 
 //funções produtos
+Produto criarProduto() {
+    Produto produto;
+
+    blueMessage("Código: ");
+    scanf("%d", &produto.codigo);
+    getchar();
+
+    blueMessage("Nome: ");
+    scanf("%[^\n]", produto.nome);
+    getchar();
+
+    blueMessage("Preço: ");
+    scanf("%f", &produto.preco);
+    getchar();
+
+    return produto;
+}
+
+void comprarProduto(Produto produto, Produto produtosComprados[]) {
+    int i = contarProdutosComprados(produtosComprados);
+    produtosComprados[i] = produto;
+}
+
 int contarProdutosComprados(Produto produtos[]) {
     int i = 0;
 
@@ -917,49 +937,6 @@ int contarProdutosComprados(Produto produtos[]) {
     }
 
     return i;
-}
-
-void comprarProduto(Produto produto, Produto produtosComprados[]) {
-    int i = contarProdutosComprados(produtosComprados);
-    produtosComprados[i] = produto;
-}
-
-int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos) {
-    int indice = -1;
-    int i = 0;
-
-    while ((i < totalProdutos) && (indice == -1)) {
-        if (produtos[i].codigo == codEntrada) {
-            indice = i;
-        }
-        i++;
-    }
-    
-    return indice;
-}
-
-int ehCodigoExistente(int codEntrada, Produto produtos[], int totalProdutos) {
-    int validacao = FALSE;
-    int i = 0;
-    while ((i < totalProdutos) && (validacao == FALSE)) {
-        if (produtos[i].codigo == codEntrada) {
-            validacao = TRUE;
-        }
-
-        i++;
-    }
-
-    return validacao;
-}
-
-void listarProdutos(Produto produtos[], int totalProdutos) {
-    for (int i = 0; i < totalProdutos; i++) {
-        printf("Código: %d\n", produtos[i].codigo);
-        printf("Nome: %s\n", produtos[i].nome);
-        printf("Preço: %.2f\n", produtos[i].preco);
-        separar();
-    }
-    
 }
 
 void removerProduto(Produto produtos[], int indice) {
@@ -986,28 +963,44 @@ void resetarProduto(Produto *produto) {
     produto->preco = 0.0;
 }
 
+int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos) {
+    int indice = -1;
+    int i = 0;
+
+    while ((i < totalProdutos) && (indice == -1)) {
+        if (produtos[i].codigo == codEntrada) {
+            indice = i;
+        }
+        i++;
+    }
+    
+    return indice;
+}
+
+void listarProdutos(Produto produtos[], int totalProdutos) {
+    for (int i = 0; i < totalProdutos; i++) {
+        printf("Código: %d\n", produtos[i].codigo);
+        printf("Nome: %s\n", produtos[i].nome);
+        printf("Preço: %.2f\n", produtos[i].preco);
+        separar();
+    }
+    
+}
+
+int ehCodigoExistente(int codEntrada, Produto produtos[], int totalProdutos) {
+    int validacao = FALSE;
+    int i = 0;
+    while ((i < totalProdutos) && (validacao == FALSE)) {
+        if (produtos[i].codigo == codEntrada) {
+            validacao = TRUE;
+        }
+
+        i++;
+    }
+
+    return validacao;
+}
+
 void cadastrarProduto(Produto produtos[], int indice, Produto produto) {
     produtos[indice] = produto;
-}
-
-Produto criarProduto() {
-    Produto produto;
-
-    blueMessage("Código: ");
-    scanf("%d", &produto.codigo);
-    getchar();
-
-    blueMessage("Nome: ");
-    scanf("%[^\n]", produto.nome);
-    getchar();
-
-    blueMessage("Preço: ");
-    scanf("%f", &produto.preco);
-    getchar();
-
-    return produto;
-}
-
-void separar() {
-    printf("---------------------------------------------\n");
 }
