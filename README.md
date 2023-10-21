@@ -26,7 +26,3 @@ Implementação correta das funcionalidades (8 pontos).
 Interface de usuário amigável com exibição adequada das informações (1 ponto).
 
 Estrutura do código e organização (1 ponto).
-
-TODO:
-    -interface apresentação
-    -tempo e data de compra
