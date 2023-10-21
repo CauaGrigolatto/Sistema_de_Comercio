@@ -45,8 +45,11 @@ void showOptions(char options[][50]);
 void showColorfulText(char text[], char color[]);
 int countOptions(char choices[][50]);
 
-int ehIdValido(int id);
 int confirmarComCredenciais(int idEntrada, char senhaEntrada[]);
+int validarId(int idEntrada);
+int validarSenha(char senhaEntrada[]);
+
+int ehIdValido(int id);
 void redMessage(char message[]);
 void greenMessage(char message[]);
 void blueMessage(char message[]);
@@ -56,13 +59,12 @@ void yellowMessage(char message[]);
 Administrador criarAdministrador();
 int verificacaoSenhaAdm(char senhaEntrada[30], Administrador adms[], int totalAdms);
 int verificacaoIdAdm(int idEntrada, Administrador adms[], int totalAdms);
-Administrador copiarAdm(Administrador adms[], int indice);
 int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms);
 
 //funções clientes
 int ehCreditoValido(float valor);
 void removerCliente(Cliente usuarios[], int indice);
-Cliente copiarCliente(Cliente usuarios[], int indice);
+void resetarCliente(Cliente *cliente);
 Cliente criarCliente();
 void listarClientes(Cliente usuarios[], int totalUsuarios);
 void visualizarDetalhesCliente(Cliente cliente);
@@ -75,9 +77,9 @@ int contarProdutosComprados(Produto produtos[]);
 void comprarProduto(Produto produto, Produto produtosComprados[]);
 int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos);
 void removerProduto(Produto produtos[], int indice);
-Produto copiarProduto(Produto produtos[], int indice);
+void resetarProduto(Produto *produto);
 void listarProdutos(Produto produtos[], int totalProdutos);
-int verificacaoCodigoProduto(int codEntrada, Produto produtos[], int totalProdutos);
+int ehCodigoExistente(int codEntrada, Produto produtos[], int totalProdutos);
 void cadastrarProduto(Produto produtos[], int indice, Produto produto);
 Produto criarProduto();
 
@@ -97,10 +99,6 @@ int main() {
     Cliente *clienteLogado;
     Administrador *admLogado;
 
-    char message[50];
-    char colorMessage[10]; 
-    strcpy(message, "");
-    strcpy(colorMessage, "blue");
 
     int totalAdms = 0;
     int totalClientes = 0;
@@ -111,7 +109,6 @@ int main() {
 
     int idLogin;
     char senhaLogin[30];
-
     int idEntrada;
 
     int indiceAdm;
@@ -120,6 +117,11 @@ int main() {
 
     float precoProduto;
     float credito;
+    
+    char message[50];
+    char colorMessage[10]; 
+    strcpy(message, "");
+    strcpy(colorMessage, "blue");
 
     //Flags
     int existeAdm; 
@@ -133,11 +135,8 @@ int main() {
     int permitirAcessoCliente;
 
     while (decisao != 3) {            
-        idValido = FALSE;
-        senhaValida = FALSE;
-
-        permitirAcessoAdm = FALSE;
-        permitirAcessoCliente = FALSE;
+        idValido = senhaValida = FALSE;
+        permitirAcessoAdm = permitirAcessoCliente = FALSE;
 
         showMainTitle("Sistema de Comércio", "blue");
         showSubtitle(message, colorMessage);
@@ -162,6 +161,7 @@ int main() {
             
             
             scanf("%d", &decisao);
+            getchar();
             strcpy(message, "");
 
 
@@ -170,7 +170,6 @@ int main() {
             if (decisao == 1) {
                 showMainTitle("Cadastrar adminstrador", "blue");
                 showSubtitle("Preencha os campos e cadastre um ADM", "blue");
-
 
                 novoAdm = criarAdministrador();
                 existeAdm = verificacaoIdAdm(novoAdm.id, administradores, totalAdms);
@@ -189,7 +188,6 @@ int main() {
                     strcpy(message, "ID inválido!");
                     strcpy(colorMessage, "red");
                 }
-            
             }
             else if (decisao == 2) {
                 showMainTitle("Cadastrar cliente", "blue");
@@ -232,6 +230,7 @@ int main() {
                 blueMessage("[2] "); printf("Entrar como cliente\n\n");
                 
                 scanf("%d", &decisao);
+                getchar();
                 strcpy(message, "");
 
                 system(CLEAR_SCREEN);
@@ -343,7 +342,7 @@ int main() {
                     showMainTitle("Cadastrar produto", "blue");
 
                     novoProduto = criarProduto();
-                    existeProduto = verificacaoCodigoProduto(novoProduto.codigo, produtos, totalProdutos);
+                    existeProduto = ehCodigoExistente(novoProduto.codigo, produtos, totalProdutos);
                     idValido = ehIdValido(novoProduto.codigo);
 
                     system(CLEAR_SCREEN);
@@ -351,6 +350,7 @@ int main() {
                     if ((existeProduto == FALSE) && (idValido)) {
                         cadastrarProduto(produtos, totalProdutos, novoProduto);
                         totalProdutos++;
+
                         strcpy(message, "Produto cadastrado!");
                         strcpy(colorMessage, "green");
                     }
@@ -358,7 +358,6 @@ int main() {
                         strcpy(message, "Código inválido!");
                         strcpy(colorMessage, "red");
                     }
-
                 }
                 else if (decisao == 2) {
                     if (totalProdutos > 0) {
@@ -374,7 +373,6 @@ int main() {
                     }
                 }
                 else if (decisao == 3) {
-
                     if (totalProdutos > 0) {
                         showMainTitle("Excluir produto", "red");
                         listarProdutos(produtos, totalProdutos);
@@ -412,7 +410,6 @@ int main() {
                         strcpy(message, "Não há produtos cadastrados!");
                         strcpy(colorMessage, "red");
                     }
-
                 }
                 else if (decisao == 4) {
                     if (totalClientes > 0){
@@ -423,6 +420,7 @@ int main() {
                         blueMessage("[2] "); printf("Voltar\n\n");
 
                         scanf("%d", &decisao);
+                        getchar();
                         strcpy(message, "");
 
                         system(CLEAR_SCREEN);
@@ -430,8 +428,8 @@ int main() {
                         if (decisao == 1) {
                             showMainTitle("Visualizar com detalhes", "blue");
                             showSubtitle("Informe o ID da conta para ver detalhes", "blue");
-
                             listarClientes(clientes, totalClientes);
+                            
                             blueMessage("ID Cliente: ");
                             scanf("%d", &idEntrada);
                             getchar();
@@ -443,8 +441,7 @@ int main() {
 
                             if (existeCliente) {
                                 showMainTitle("Detalhes da conta", "blue");
-                                novoCliente = clientes[indiceCliente];
-                                visualizarDetalhesCliente(novoCliente);
+                                visualizarDetalhesCliente(clientes[indiceCliente]);
 
                                 yellowMessage("Pressione ENTER para voltar\n");
                                 getchar();
@@ -470,6 +467,7 @@ int main() {
                     if (totalClientes > 0) {
                         showMainTitle("Excluir cliente", "red");
                         listarClientes(clientes, totalClientes);
+
                         blueMessage("ID Cliente: ");
                         scanf("%d", &idEntrada);
                         getchar();
@@ -549,19 +547,16 @@ int main() {
 
                         if (decisao != -1) {
                             indiceProduto = encontrarIndiceProduto(decisao, produtos, totalProdutos);
-
                             existeProduto = indiceProduto != -1;
 
                             if (existeProduto) {
-
                                 precoProduto = produtos[indiceProduto].preco;
 
                                 if (clienteLogado->credito >= precoProduto) {
-                                    
                                     permitirAcessoCliente = confirmarComCredenciais(clienteLogado->id, clienteLogado->senha);
 
                                     if (permitirAcessoCliente) {
-                                        novoProduto = copiarProduto(produtos, indiceProduto);
+                                        novoProduto = produtos[indiceProduto];
                                         comprarProduto(novoProduto, clienteLogado->produtosComprados);
 
                                         clienteLogado->credito -= novoProduto.preco;
@@ -578,13 +573,11 @@ int main() {
                                     strcpy(message, "Créditos insuficientes!");
                                     strcpy(colorMessage, "red");
                                 } 
-
                             }
                             else {
                                 strcpy(message, "ID inválido!");
                                 strcpy(colorMessage, "red");
                             }
-
                         }
                         else if (decisao == -1) {
                             strcpy(message, "Compra cancelada!");
@@ -642,7 +635,6 @@ int main() {
                         strcpy(message, "ID ou senha inválidos!");
                         strcpy(colorMessage, "red");
                     }
-
                 }
                 else if (decisao == 4) {
                     strcpy(message, "Saiu da conta!");
@@ -685,58 +677,50 @@ void showColorfulText(char text[], char color[]) {
     }
 }
 
-void showOptions(char options[][50]) {
-    int totalOptions = countOptions(options);
-
-    for (int i = 0; i < totalOptions; i++) {
-        printf("[%d] %s\n", (i+1), options[i]);    
-    }
-}
-
-int countOptions(char choices[][50]) {
-    int i = 0;
-
-    while (choices[i][0] != '\0') {
-        i++;
-    }
-    
-    return i;
-}
-
 int ehIdValido(int id) {
     return id > 0;
 }
-
 
 int ehCreditoValido(float valor) {
     return valor >= 0;
 }
 
 int confirmarComCredenciais(int idEntrada, char senhaEntrada[]) {
-    int idLogin;
-    char senhaLogin[30];
-
     int idValido, senhaValida, permitirAcesso;
 
     showMainTitle("Confirmar credenciais", "blue");
+        
+    idValido = validarId(idEntrada);
+    senhaValida = validarSenha(senhaEntrada);
+    
+    permitirAcesso = idValido && senhaValida;
+    
+    system(CLEAR_SCREEN);
+
+    return permitirAcesso;
+}
+
+int validarId(int idEntrada) {
+    int idLogin;
 
     blueMessage("ID: ");
     scanf("%d", &idLogin);
     getchar();
 
+    return idLogin == idEntrada;
+}
+
+int validarSenha(char senhaEntrada[]) {
+    char senhaLogin[30];
+
     blueMessage("Senha: ");
     scanf("%[^\n]", senhaLogin);
     getchar();
 
-    system(CLEAR_SCREEN);
-    
-    idValido = idLogin == idEntrada;
-    senhaValida = strcmp(senhaLogin, senhaEntrada) == 0;
-    permitirAcesso = idValido && senhaValida;
-
-    return permitirAcesso;
+    return (strcmp(senhaLogin, senhaEntrada) == 0);
 }
 
+//mensagens de cor
 void redMessage(char message[]) {
     printf("\033[1;31m%s\033[1;31m", message);
     printf("\033[0m");
@@ -800,16 +784,6 @@ Administrador criarAdministrador() {
     getchar();
   
     return novoAdm;
-}
-
-Administrador copiarAdm(Administrador adms[], int indice) {
-    Administrador admCopia;
-
-    admCopia.id = adms[indice].id;
-    strcpy(admCopia.nome, adms[indice].nome);
-    strcpy(admCopia.senha, adms[indice].senha);
-    
-    return admCopia;
 }
 
 int encontrarIndiceAdm(int idEntrada, Administrador adms[], int totalAdms) {
@@ -901,47 +875,37 @@ void removerCliente(Cliente clientes[], int indice) {
 
     if (clientes[i].nome[0] != '\0') {
         while (clientes[i].nome[0] != '\0') {
-            clienteCopia = copiarCliente(clientes, i);
+            clienteCopia = clientes[i];
             clientes[i-1] = clienteCopia;
             i++;
         }
 
-        clientes[i].id = 0;
-        strcpy(clientes[i].nome, "");
-        strcpy(clientes[i].senha, "");
-        clientes[i].credito = 0;
+        resetarCliente(&clientes[i]);
     }
     else {
-        clientes[indice].id = 0;
-        strcpy(clientes[indice].nome, "");
-        strcpy(clientes[indice].senha, "");
-        clientes[indice].credito = 0;
+        resetarCliente(&clientes[indice]);
     }
 }
 
-Cliente copiarCliente(Cliente clientes[], int indice) {
-    Cliente clienteCopia;
-
-    clienteCopia.id = clientes[indice].id;
-    strcpy(clienteCopia.nome, clientes[indice].nome);
-    strcpy(clienteCopia.senha, clientes[indice].senha);
-    clienteCopia.credito = clientes[indice].credito;
-    
-    return clienteCopia;
+void resetarCliente(Cliente *cliente) {
+    cliente->id = 0;
+    strcpy(cliente->nome, "\0");
+    strcpy(cliente->senha, "\0");
+    cliente->credito = 0;
 }
 
 int encontrarIndiceCliente(int idEntrada, Cliente clientes[], int totalClientes) {
-    int indice = -1;
+    int indiceCliente = -1;
     int i = 0;
 
-    while ((i < totalClientes) && (indice == -1)) {
+    while ((i < totalClientes) && (indiceCliente == -1)) {
         if (clientes[i].id == idEntrada) {
-            indice = i;
+            indiceCliente = i;
         }
         i++;
     }
     
-    return indice;
+    return indiceCliente;
 }
 
 //funções produtos
@@ -974,7 +938,7 @@ int encontrarIndiceProduto(int codEntrada, Produto produtos[], int totalProdutos
     return indice;
 }
 
-int verificacaoCodigoProduto(int codEntrada, Produto produtos[], int totalProdutos) {
+int ehCodigoExistente(int codEntrada, Produto produtos[], int totalProdutos) {
     int validacao = FALSE;
     int i = 0;
     while ((i < totalProdutos) && (validacao == FALSE)) {
@@ -1004,31 +968,22 @@ void removerProduto(Produto produtos[], int indice) {
 
     if (produtos[i].nome[0] != '\0') {
         while (produtos[i].nome[0] != '\0') {
-            copiaProduto = copiarProduto(produtos, i);
+            copiaProduto = produtos[i];
             produtos[i-1] = copiaProduto;
             i++;
         }
 
-        produtos[i].codigo = 0;
-        strcpy(produtos[i].nome, "");
-        produtos[i].preco = 0.0;
+        resetarProduto(&produtos[i]);
     }
     else {
-        produtos[indice].codigo = 0;
-        strcpy(produtos[indice].nome, "");
-        produtos[indice].preco = 0.0;
-    }    
-    
+        resetarProduto(&produtos[indice]);
+    }       
 }
 
-Produto copiarProduto(Produto produtos[], int indice) {
-    Produto copiaProduto;
-
-    copiaProduto.codigo = produtos[indice].codigo;
-    strcpy(copiaProduto.nome, produtos[indice].nome);
-    copiaProduto.preco = produtos[indice].preco;
-
-    return copiaProduto;
+void resetarProduto(Produto *produto) {
+    produto->codigo = 0;
+    strcpy(produto->nome, "\0");
+    produto->preco = 0.0;
 }
 
 void cadastrarProduto(Produto produtos[], int indice, Produto produto) {
