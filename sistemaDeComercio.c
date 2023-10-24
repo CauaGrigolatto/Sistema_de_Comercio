@@ -1,3 +1,9 @@
+/*
+    Cauã Grigolatto Domingos
+    AQ3022323
+    #FreeSoftware
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +37,7 @@ typedef struct Cliente {
     char id[30];
     char nome[30];
     char senha[30];
+    int totalComprados;
     Produto produtosComprados[100];
     float credito;
 } Cliente;
@@ -70,8 +77,7 @@ int encontrarIndiceCliente(char idEntrada[], Cliente clientes[], int totalClient
 
 //funções produtos
 Produto criarProduto();
-void comprarProduto(Produto produto, Produto produtosComprados[]);
-int contarProdutosComprados(Produto produtos[]);
+void comprarProduto(Produto produto, Produto produtosComprados[], int indice);
 void removerProduto(Produto produtos[], int indice);
 void resetarProduto(Produto *produto);
 int encontrarIndiceProduto(char codEntrada[], Produto produtos[], int totalProdutos);
@@ -546,7 +552,10 @@ int main() {
 
                                     if (permitirAcessoCliente) {
                                         novoProduto = produtos[indiceProduto];
-                                        comprarProduto(novoProduto, clienteLogado->produtosComprados);
+
+                                        comprarProduto(novoProduto, clienteLogado->produtosComprados, clienteLogado->totalComprados);
+                                        clienteLogado->totalComprados += 1;
+
 
                                         clienteLogado->credito -= novoProduto.preco;
                                         
@@ -579,11 +588,9 @@ int main() {
                     }
                 } 
                 else if (decisao == 2) {
-                    totalComprados = contarProdutosComprados(clienteLogado->produtosComprados);
-                    
-                    if (totalComprados > 0) {
+                    if (clienteLogado->totalComprados > 0) {
                         showMainTitle("Produtos comprados", "blue");
-                        listarProdutos(clienteLogado->produtosComprados, totalComprados);
+                        listarProdutos(clienteLogado->produtosComprados, clienteLogado->totalComprados);
                         
                         yellowMessage("Pressione ENTER para voltar\n");
                         getchar();
@@ -810,6 +817,7 @@ Cliente criarCliente() {
     getchar();
 
     novoCliente.credito = 0;
+    novoCliente.totalComprados = 0;
   
     return novoCliente;
 }
@@ -876,15 +884,12 @@ void listarClientes(Cliente clientes[], int totalClientes) {
 }
 
 void visualizarDetalhesCliente(Cliente cliente) {
-    int totalComprados;
-    totalComprados = contarProdutosComprados(cliente.produtosComprados);
-
     printf("Id: %s\n", cliente.id);
     printf("Nome: %s\n", cliente.nome);
     printf("Senha: %s\n", cliente.senha);
     printf("Crédito: %.2f\n\n", cliente.credito);
-    printf("Comprados (%d):\n\n", totalComprados);
-    listarProdutos(cliente.produtosComprados, totalComprados);
+    printf("Comprados (%d):\n\n", cliente.totalComprados);
+    listarProdutos(cliente.produtosComprados, cliente.totalComprados);
 }
 
 int encontrarIndiceCliente(char idEntrada[], Cliente clientes[], int totalClientes) {
@@ -920,19 +925,9 @@ Produto criarProduto() {
     return produto;
 }
 
-void comprarProduto(Produto produto, Produto produtosComprados[]) {
-    int i = contarProdutosComprados(produtosComprados);
-    produtosComprados[i] = produto;
-}
-
-int contarProdutosComprados(Produto produtos[]) {
-    int i = 0;
-
-    while (produtos[i].nome[0] != '\0') {
-        i++;
-    }
-
-    return i;
+//melhorar função
+void comprarProduto(Produto produto, Produto produtosComprados[], int indice) {
+    produtosComprados[indice] = produto;
 }
 
 void removerProduto(Produto produtos[], int indice) {
